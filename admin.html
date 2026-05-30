@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpinWish — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-page">
+  <div class="noise"></div>
+
+  <!-- ADMIN LOGIN -->
+  <div id="admin-login-screen" class="admin-login-screen" style="padding:1rem">
+    <div class="admin-login-card">
+      <h2>Admin <span style="color:var(--red)">Panel</span></h2>
+      <div class="field"><label>Admin Email</label><input type="email" id="admin-email" placeholder="admin@spinwish.com" /></div>
+      <div class="field"><label>Password</label><input type="password" id="admin-pass" placeholder="••••••••" /></div>
+      <div id="admin-error" class="form-error"></div>
+      <button class="btn-primary" onclick="adminLogin()">Enter Panel</button>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px">Authorised admins only</p>
+      <p style="text-align:center;margin-top:12px"><a href="index.html" style="color:var(--muted);font-size:12px">← Back to site</a></p>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="admin-panel" style="display:none">
+    <nav class="navbar">
+      <div class="nav-brand">
+        <span class="brand-icon">✦</span>
+        <span class="brand-name">SpinWish</span>
+        <span style="font-size:11px;color:var(--red);font-weight:700;margin-left:8px;border:1px solid rgba(255,77,109,0.4);padding:3px 8px;border-radius:4px;letter-spacing:0.05em">ADMIN</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="user-chip" id="admin-user-chip">Admin</span>
+        <a href="index.html" class="btn-logout" style="text-decoration:none">← Site</a>
+        <button class="btn-logout" onclick="adminLogout()">Log out</button>
+      </div>
+    </nav>
+
+    <div class="admin-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:1.5rem">
+        <div class="admin-title">Admin <span>Dashboard</span></div>
+        <button onclick="refreshAll()" style="padding:8px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--muted);font-size:13px;cursor:pointer">↻ Refresh</button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Spins</div><div class="stat-value" id="stat-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Claims</div><div class="stat-value" id="stat-pending" style="color:var(--gold)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Tickets Generated</div><div class="stat-value" id="stat-tickets">—</div></div>
+        <div class="stat-card"><div class="stat-label">Tickets Used</div><div class="stat-value" id="stat-used" style="color:var(--green)">—</div></div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-spins"   onclick="switchTab('spins')">🎡 Spins</button>
+        <button class="tab-btn"        id="tab-tickets" onclick="switchTab('tickets')">🎟️ Tickets</button>
+        <button class="tab-btn"        id="tab-users"   onclick="switchTab('users')">👤 Users</button>
+        <button class="tab-btn"        id="tab-verify"  onclick="switchTab('verify')">🔍 Verify</button>
+      </div>
+
+      <!-- ══ SPINS TAB ══ -->
+      <div id="panel-spins">
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterSpins('all',this)">All</button>
+          <button class="filter-btn" onclick="filterSpins('pending',this)">⏳ Pending</button>
+          <button class="filter-btn" onclick="filterSpins('claimed',this)">✅ Claimed</button>
+          <button class="filter-btn" onclick="filterSpins('nothing',this)">— Nothing</button>
+          <button class="filter-btn" onclick="filterSpins('rejected',this)">❌ Rejected</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr>
+              <th>Spin ID</th><th>User</th><th>Type</th><th>Prize</th><th>Status</th><th>Date</th><th>Action</th>
+            </tr></thead>
+            <tbody id="spins-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TICKETS TAB ══ -->
+      <div id="panel-tickets" style="display:none">
+
+        <!-- Pity Prize Settings -->
+        <div class="gen-ticket-box" style="margin-bottom:1.5rem">
+          <h3>🎯 Pity Prize Settings</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Set what prize players receive on their 100th spin (separately for Normal and Golden).</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#b0a4ff;margin-bottom:8px">🎯 Normal Spin Pity (every 100 spins)</div>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="normal-pity-input" placeholder="e.g. 325 UC / $4.99" style="flex:1;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none" />
+                <button onclick="setPityPrize('normal')" style="padding:9px 16px;background:var(--accent);border:none;border-radius:var(--radius-sm);color:white;font-weight:700;font-size:13px;cursor:pointer">Save</button>
+              </div>
+              <div id="normal-pity-current" style="font-size:12px;color:var(--muted);margin-top:6px">Loading...</div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:8px">👑 Golden Spin Pity (every 100 spins)</div>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="golden-pity-input" placeholder="e.g. 1800 UC / $19.99" style="flex:1;padding:9px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:13px;outline:none" />
+                <button onclick="setPityPrize('golden')" style="padding:9px 16px;background:linear-gradient(135deg,#f4c430,#ff9500);border:none;border-radius:var(--radius-sm);color:#0a0a0f;font-weight:700;font-size:13px;cursor:pointer">Save</button>
+              </div>
+              <div id="golden-pity-current" style="font-size:12px;color:var(--muted);margin-top:6px">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generate tickets -->
+        <div class="gen-ticket-box">
+          <h3>🎟️ Generate Tickets</h3>
+          <div class="gen-row">
+            <div class="field">
+              <label>Tokens per ticket</label>
+              <input type="number" id="ticket-tokens" value="3" min="1" max="100" placeholder="e.g. 3" />
+            </div>
+            <div class="field">
+              <label>Quantity</label>
+              <input type="number" id="ticket-qty" value="1" min="1" max="50" placeholder="How many?" />
+            </div>
+            <button class="btn-gen" onclick="generateTickets()">Generate</button>
+          </div>
+          <div id="ticket-output" class="ticket-output">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Generated codes — click to copy:</div>
+            <div id="ticket-codes-list"></div>
+          </div>
+        </div>
+
+        <!-- All tickets table -->
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr>
+              <th>Code</th><th>Tokens</th><th>Status</th><th>Used By</th><th>Date Created</th>
+            </tr></thead>
+            <tbody id="tickets-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ USERS TAB ══ -->
+      <div id="panel-users" style="display:none">
+        <div class="user-search-box">
+          <h3>👤 Find User &amp; Add Tokens</h3>
+          <div class="lookup-bar">
+            <input type="text" id="user-search-input" placeholder="Enter username or email…" />
+            <button class="btn-lookup" onclick="searchUser()">Search</button>
+          </div>
+          <div class="user-result" id="user-result">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <div>
+                <div style="font-weight:600;font-size:15px" id="ur-username"></div>
+                <div style="font-size:12px;color:var(--muted)" id="ur-email"></div>
+              </div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold)">
+                <span id="ur-tokens">0</span> <span style="font-size:14px;color:var(--muted)">tokens</span>
+              </div>
+            </div>
+            <div class="add-tokens-row">
+              <input type="number" id="add-tokens-amount" placeholder="Tokens to add…" min="1" />
+              <button class="btn-add-tok" onclick="addTokensToUser()">+ Add Tokens</button>
+            </div>
+            <div id="add-tokens-msg" style="font-size:12px;margin-top:6px;min-height:16px"></div>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead><tr>
+              <th>Username</th><th>Email</th><th>Tokens</th><th>Joined</th><th>Action</th>
+            </tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ VERIFY TAB ══ -->
+      <div id="panel-verify" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Paste a Spin ID to verify it and claim or reject the prize.</p>
+        <div class="lookup-bar">
+          <input type="text" id="verify-input" placeholder="e.g. SWG-M3X7A2-K9PQ or SWN-…" />
+          <button class="btn-lookup" onclick="verifySpin()">Verify</button>
+        </div>
+        <div class="lookup-result" id="verify-result">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:1rem" id="verify-title"></div>
+          <div class="lr-grid" id="verify-grid"></div>
+          <div class="lr-actions" id="verify-actions"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./js/firebase-config.js";
+    import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      collection, doc, getDoc, getDocs, setDoc, updateDoc,
+      query, orderBy, limit, where, serverTimestamp, increment, runTransaction
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // ── IMPORTANT: Add your admin emails here ──
+    const ADMIN_EMAILS = ["mouhamadzapt@gmail.com"]; // ← Change this
+
+    let allSpins  = [];
+    let foundUser = null;
+    let currentFilter = "all";
+
+    // ── AUTH ──────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+      if (user && ADMIN_EMAILS.includes(user.email)) {
+        document.getElementById("admin-login-screen").style.display = "none";
+        document.getElementById("admin-panel").style.display = "";
+        document.getElementById("admin-user-chip").textContent = user.email;
+        refreshAll();
+      }
+    });
+
+    window.adminLogin = async function() {
+      const email = document.getElementById("admin-email").value.trim();
+      const pass  = document.getElementById("admin-pass").value;
+      const err   = document.getElementById("admin-error");
+      err.textContent = "";
+      if (!email || !pass) { err.textContent = "Fill in all fields."; return; }
+      if (!ADMIN_EMAILS.includes(email)) { err.textContent = "Not an admin account."; return; }
+      try { await signInWithEmailAndPassword(auth, email, pass); }
+      catch { err.textContent = "Invalid credentials."; }
+    };
+
+    window.adminLogout = async function() { await signOut(auth); location.reload(); };
+
+    // ── TABS ──────────────────────────────────
+    window.switchTab = function(tab) {
+      ["spins","tickets","users","verify"].forEach(t => {
+        document.getElementById(`panel-${t}`).style.display = t === tab ? "" : "none";
+        document.getElementById(`tab-${t}`).classList.toggle("active", t === tab);
+      });
+      if (tab === "tickets") { loadTickets(); loadPityPrizes(); }
+      if (tab === "users")   loadUsers();
+    };
+
+    window.refreshAll = async function() {
+      await loadSpins();
+      loadStats();
+    };
+
+    // ── STATS ─────────────────────────────────
+    async function loadStats() {
+      document.getElementById("stat-total").textContent   = allSpins.length;
+      document.getElementById("stat-pending").textContent = allSpins.filter(s => s.status === "pending").length;
+      const tSnap = await getDocs(collection(db, "tickets"));
+      document.getElementById("stat-tickets").textContent = tSnap.size;
+      document.getElementById("stat-used").textContent    = tSnap.docs.filter(d => d.data().used).length;
+    }
+
+    // ── SPINS ─────────────────────────────────
+    async function loadSpins() {
+      const snap = await getDocs(query(collection(db, "spins"), orderBy("createdAt","desc"), limit(200)));
+      allSpins = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderSpins(currentFilter);
+    }
+
+    function renderSpins(filter) {
+      currentFilter = filter;
+      const tbody = document.getElementById("spins-tbody");
+      const rows  = filter === "all" ? allSpins : allSpins.filter(s => s.status === filter);
+      if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">No spins found.</td></tr>`; return; }
+
+      const sl = { "pending":"⏳ Pending","claimed":"✅ Claimed","claimed-token":"✅ Token","golden-ticket":"🎫 Golden","nothing":"— Nothing","rejected":"❌ Rejected" };
+      const sc = { "pending":"pending","claimed":"claimed","claimed-token":"claimed","golden-ticket":"status-golden-ticket","nothing":"nothing","rejected":"rejected" };
+      const typeTag = (t) => t === "golden" ? `<span style="color:var(--gold);font-size:10px">👑</span>` : `<span style="color:#b0a4ff;font-size:10px">🎯</span>`;
+
+      tbody.innerHTML = rows.map(s => {
+        const ts  = s.createdAt?.toDate?.()?.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) || "—";
+        const canAct = s.status === "pending";
+        return `<tr>
+          <td style="font-family:monospace;font-size:11px;color:var(--muted);cursor:pointer" onclick="copyT('${s.spinId}')">${s.spinId}</td>
+          <td>${s.username||"—"}</td>
+          <td>${typeTag(s.spinType)}</td>
+          <td style="font-weight:600">${s.prize}</td>
+          <td><span class="status-badge status-${sc[s.status]||"nothing"}">${sl[s.status]||s.status}</span></td>
+          <td style="color:var(--muted);font-size:12px">${ts}</td>
+          <td>${canAct ? `<button class="btn-claim" onclick="claimSpin('${s.spinId}','${s.uid}')">✓</button> <button class="btn-reject" onclick="rejectSpin('${s.spinId}','${s.uid}')">✕</button>` : "—"}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    window.filterSpins = function(filter, btn) {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderSpins(filter);
+    };
+
+    window.claimSpin = async function(spinId, uid) {
+      if (!confirm(`Mark ${spinId} as CLAIMED?`)) return;
+      await updateDoc(doc(db, "spins", spinId), { status: "claimed", claimedAt: serverTimestamp() });
+      await updateDoc(doc(db, "users", uid, "spinHistory", spinId), { status: "claimed" });
+      await loadSpins(); loadStats();
+    };
+
+    window.rejectSpin = async function(spinId, uid) {
+      if (!confirm(`Mark ${spinId} as REJECTED?`)) return;
+      await updateDoc(doc(db, "spins", spinId), { status: "rejected" });
+      await updateDoc(doc(db, "users", uid, "spinHistory", spinId), { status: "rejected" });
+      await loadSpins(); loadStats();
+    };
+
+    // ── TICKETS ───────────────────────────────
+    function generateCode() {
+      const a = Math.random().toString(36).substring(2,6).toUpperCase();
+      const b = Math.random().toString(36).substring(2,6).toUpperCase();
+      return `SW-${a}-${b}`;
+    }
+
+    window.generateTickets = async function() {
+      const tokens = parseInt(document.getElementById("ticket-tokens").value) || 3;
+      const qty    = parseInt(document.getElementById("ticket-qty").value)    || 1;
+      const codes  = [];
+
+      for (let i = 0; i < qty; i++) {
+        const code = generateCode();
+        await setDoc(doc(db, "tickets", code), {
+          code, tokens, used: false, usedBy: null,
+          createdAt: serverTimestamp()
+        });
+        codes.push(code);
+      }
+
+      const out = document.getElementById("ticket-output");
+      const list = document.getElementById("ticket-codes-list");
+      out.classList.add("show");
+      list.innerHTML = codes.map(c => `
+        <div class="ticket-code-display" onclick="copyT('${c}')" title="Click to copy">
+          ${c} <span style="font-size:12px;color:var(--muted);font-family:'Outfit',sans-serif">(${tokens} tokens) 📋</span>
+        </div>
+      `).join("");
+
+      loadStats();
+      loadTickets();
+    };
+
+    async function loadTickets() {
+      const tbody = document.getElementById("tickets-tbody");
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1rem">Loading…</td></tr>`;
+      const snap = await getDocs(query(collection(db, "tickets"), orderBy("createdAt","desc"), limit(100)));
+      if (snap.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">No tickets yet.</td></tr>`; return; }
+      tbody.innerHTML = snap.docs.map(d => {
+        const t  = d.data();
+        const ts = t.createdAt?.toDate?.()?.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) || "—";
+        return `<tr>
+          <td style="font-family:monospace;font-weight:700;color:var(--gold);cursor:pointer" onclick="copyT('${t.code}')">${t.code} 📋</td>
+          <td>🎟️ ${t.tokens}</td>
+          <td><span class="status-badge status-${t.used?"used":"active"}">${t.used?"✅ Used":"🟢 Active"}</span></td>
+          <td style="color:var(--muted);font-size:12px">${t.usedBy||"—"}</td>
+          <td style="color:var(--muted);font-size:12px">${ts}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    // ── USERS ─────────────────────────────────
+    async function loadUsers() {
+      const tbody = document.getElementById("users-tbody");
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1rem">Loading…</td></tr>`;
+      const snap = await getDocs(query(collection(db, "users"), orderBy("createdAt","desc"), limit(100)));
+      if (snap.empty) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">No users yet.</td></tr>`; return; }
+      tbody.innerHTML = snap.docs.map(d => {
+        const u  = d.data();
+        const ts = u.createdAt?.toDate?.()?.toLocaleString("en-US",{month:"short",day:"numeric"}) || "—";
+        return `<tr>
+          <td style="font-weight:600">${u.username||"—"}</td>
+          <td style="color:var(--muted);font-size:12px">${u.email||"—"}</td>
+          <td style="color:var(--gold);font-weight:600">🎟️ ${u.tokens??0}</td>
+          <td style="color:var(--muted);font-size:12px">${ts}</td>
+          <td><button onclick="quickAddTokens('${d.id}','${u.username}')" style="padding:5px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:12px;cursor:pointer">+ Tokens</button></td>
+        </tr>`;
+      }).join("");
+    }
+
+    window.searchUser = async function() {
+      const query_val = document.getElementById("user-search-input").value.trim().toLowerCase();
+      const snap      = await getDocs(collection(db, "users"));
+      const match     = snap.docs.find(d => {
+        const u = d.data();
+        return u.username?.toLowerCase() === query_val || u.email?.toLowerCase() === query_val;
+      });
+      const res = document.getElementById("user-result");
+      if (!match) { res.classList.remove("show"); alert("User not found."); return; }
+      foundUser = { id: match.id, ...match.data() };
+      document.getElementById("ur-username").textContent = foundUser.username;
+      document.getElementById("ur-email").textContent    = foundUser.email;
+      document.getElementById("ur-tokens").textContent   = foundUser.tokens ?? 0;
+      document.getElementById("add-tokens-msg").textContent = "";
+      res.classList.add("show");
+    };
+
+    window.quickAddTokens = async function(uid, username) {
+      document.getElementById("user-search-input").value = username;
+      switchTab("users");
+      const snap = await getDoc(doc(db, "users", uid));
+      foundUser = { id: uid, ...snap.data() };
+      document.getElementById("ur-username").textContent = foundUser.username;
+      document.getElementById("ur-email").textContent    = foundUser.email;
+      document.getElementById("ur-tokens").textContent   = foundUser.tokens ?? 0;
+      document.getElementById("user-result").classList.add("show");
+    };
+
+    window.addTokensToUser = async function() {
+      if (!foundUser) return;
+      const amount = parseInt(document.getElementById("add-tokens-amount").value);
+      const msg    = document.getElementById("add-tokens-msg");
+      if (!amount || amount < 1) { msg.style.color="var(--red)"; msg.textContent="Enter a valid amount."; return; }
+      await updateDoc(doc(db, "users", foundUser.id), { tokens: increment(amount) });
+      msg.style.color = "var(--green)";
+      msg.textContent = `✓ Added ${amount} tokens to ${foundUser.username}`;
+      document.getElementById("ur-tokens").textContent = (foundUser.tokens ?? 0) + amount;
+      foundUser.tokens = (foundUser.tokens ?? 0) + amount;
+      document.getElementById("add-tokens-amount").value = "";
+      loadStats();
+    };
+
+    // ── VERIFY SPIN ───────────────────────────
+    window.verifySpin = async function() {
+      const id  = document.getElementById("verify-input").value.trim().toUpperCase();
+      const res = document.getElementById("verify-result");
+      if (!id) return;
+
+      const snap = await getDoc(doc(db, "spins", id));
+      if (!snap.exists()) {
+        document.getElementById("verify-title").textContent = "❌ Not Found";
+        document.getElementById("verify-grid").innerHTML    = `<p style="color:var(--red)">No record found for: ${id}</p>`;
+        document.getElementById("verify-actions").innerHTML = "";
+        res.classList.add("show"); return;
+      }
+
+      const s  = snap.data();
+      const ts = s.createdAt?.toDate?.()?.toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"}) || "—";
+      const sl = { "pending":"⏳ Pending","claimed":"✅ Claimed","golden-ticket":"🎫 Golden Ticket","nothing":"— No Prize","rejected":"❌ Rejected" };
+
+      document.getElementById("verify-title").innerHTML = `✦ Spin Verified &nbsp;<span class="status-badge status-${s.status}">${sl[s.status]||s.status}</span>`;
+      document.getElementById("verify-grid").innerHTML = `
+        <div class="lr-field"><div class="lrf-label">Spin ID</div><div class="lrf-value">${s.spinId}</div></div>
+        <div class="lr-field"><div class="lrf-label">Player</div><div class="lrf-value">${s.username||"—"}</div></div>
+        <div class="lr-field"><div class="lrf-label">Prize</div><div class="lrf-value" style="color:var(--gold);font-size:16px;font-weight:700">${s.prize}</div></div>
+        <div class="lr-field"><div class="lrf-label">Spin Type</div><div class="lrf-value">${s.spinType==="golden"?"👑 Golden":"🎯 Normal"}</div></div>
+        <div class="lr-field"><div class="lrf-label">Date</div><div class="lrf-value">${ts}</div></div>
+        <div class="lr-field"><div class="lrf-label">Tokens Before</div><div class="lrf-value">${s.tokensBefore??"—"}</div></div>
+      `;
+
+      const canAct = s.status === "pending";
+      document.getElementById("verify-actions").innerHTML = canAct
+        ? `<button class="btn-claim" onclick="claimSpin('${s.spinId}','${s.uid}')">✓ Mark Claimed</button>
+           <button class="btn-reject" onclick="rejectSpin('${s.spinId}','${s.uid}')">✕ Reject</button>`
+        : `<p style="color:var(--muted);font-size:13px">This spin has already been processed.</p>`;
+
+      res.classList.add("show");
+    };
+
+    // ── UTILS ─────────────────────────────────
+    window.copyT = function(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const tmp = document.createElement("div");
+        tmp.textContent = "✓ Copied!";
+        tmp.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:8px 20px;border-radius:99px;font-weight:700;font-size:13px;z-index:9999";
+        document.body.appendChild(tmp);
+        setTimeout(() => tmp.remove(), 1500);
+      });
+    };
+  </script>
+</body>
+</html>
