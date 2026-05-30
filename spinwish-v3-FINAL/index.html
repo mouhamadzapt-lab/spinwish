@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpinWish — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-page">
+  <div class="noise"></div>
+  <div class="auth-glow glow-left"></div>
+  <div class="auth-glow glow-right"></div>
+
+  <!-- Small discreet admin button bottom-right corner -->
+  <a href="admin.html" class="admin-corner-btn" title="Admin">⚙</a>
+
+  <div class="auth-wrap">
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span class="brand-name">SpinWish</span>
+    </div>
+    <p class="brand-sub">Spin the wheel. Win PUBG Mobile UC.</p>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="login-form">
+        <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com" /></div>
+        <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" /></div>
+        <div id="login-error" class="form-error"></div>
+        <button class="btn-primary" onclick="doLogin()">
+          <span>Sign In</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="register-form" style="display:none">
+        <div class="field"><label>Username</label><input type="text" id="reg-username" placeholder="your_username" /></div>
+        <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com" /></div>
+        <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="min 6 characters" /></div>
+        <div id="register-error" class="form-error"></div>
+        <button class="btn-primary" onclick="doRegister()">
+          <span>Create Account</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>
