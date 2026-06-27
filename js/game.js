@@ -18,7 +18,7 @@ const SPINS = {
     colors: ["#3a3080","#2d2466","#453a99","#221a55","#3d3590","#28206e","#4a40a8","#1e1a50"],
     prizes: [
       { label: "60 UC / $0.99",    value: "60uc",          weight: 3 },
-      { label: "30 UC / $0.99",    value: "30uc",          weight: 15 },
+      { label: "30 UC / $0.49",    value: "30uc",          weight: 15 },
       { label: "Golden Ticket",    value: "golden_ticket", weight: 1  },
       { label: "Free Token",       value: "free_token",    weight: 6  },
       { label: "1800 UC / $19.99", value: "1800uc",        weight: 0  },
