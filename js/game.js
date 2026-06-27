@@ -18,9 +18,9 @@ const SPINS = {
     colors: ["#3a3080","#2d2466","#453a99","#221a55","#3d3590","#28206e","#4a40a8","#1e1a50"],
     prizes: [
       { label: "60 UC / $0.99",    value: "60uc",          weight: 3 },
-      { label: "30 UC / $0.99",    value: "30uc",          weight: 18 },
+      { label: "30 UC / $0.99",    value: "30uc",          weight: 15 },
       { label: "Golden Ticket",    value: "golden_ticket", weight: 1  },
-      { label: "Free Token",       value: "free_token",    weight: 3  },
+      { label: "Free Token",       value: "free_token",    weight: 6  },
       { label: "1800 UC / $19.99", value: "1800uc",        weight: 0  },
       { label: "Nothing",          value: "nothing",       weight: 35 },
       { label: "Nothing",          value: "nothing",       weight: 45 },
@@ -28,7 +28,7 @@ const SPINS = {
   },
   golden: {
     name: "Golden Spin",
-    cost: 5,
+    cost: 7,
     pityAt: 100,
     colors: ["#8b6914","#a07818","#c49020","#e0aa28","#b07010","#d09820","#f0b830","#986010"],
     prizes: [
